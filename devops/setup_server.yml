@@ -79,9 +79,6 @@
       action: file dest={{ webapps_dir }}/{{ app_name }}/log state=directory
 
     - name: ensure database directory
-      action: file dest={{ webapps_dir }}/{{ app_name }}/var owner=www-data group=www-data mode=0644 state=directory
-
-    - name: ensure database directory
       action: file dest={{ webapps_dir }}/{{ app_name }}/db owner=www-data group=www-data mode=0644 state=directory
 
     - name: deploy code from repository
@@ -100,9 +97,6 @@
 
     - name: change permissions database
       shell: cd {{ webapps_dir }}/{{ app_name }}/db; chown www-data:www-data app.db
-
-    - name: change permissions socket
-      shell: chmod 0755 {{ webapps_dir }}/{{ app_name }}/var
 
   handlers:
     - name: restart nginx
