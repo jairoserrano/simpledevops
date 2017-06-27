@@ -1,0 +1,43 @@
+<!--
+Original template:
+https://codepen.io/josephhirst/pen/fljha?js-preprocessor=none
+-->
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+	<link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
+	<title>Ormuco test</title>
+	<h1>Ormuco test</h1>
+</head>
+<body>
+  <div id="form-container"><!-- BEGINS FORM CONTAINER -->
+	    <form action="/" method="post" autocomplete="on">
+	       	<input class="name-box" type="text" name="name" placeholder="Name"><br />
+	       	<input class="email-box" type="text" name="color" input="color" placeholder="Favorite Color"><br />
+          <input class="email-box" type="text" name="pet" input="pet" placeholder="Cats or Dogs"><br />
+	        <input class="animated bounceIn" type="submit" value="Save data">
+					{% with messages = get_flashed_messages() %}
+				  	{% if messages %}
+					    <ul class=flashes>
+					    {% for message in messages %}
+					      <li>{{ message }}</li>
+					    {% endfor %}
+					    </ul>
+				  	{% endif %}
+					{% endwith %}
+    	</form>
+      {% if data %}
+        {% for da in data %}
+        <input class="name-box" readonly type="text" placeholder="Saved {{ da.name }}, {{ da.color }}, {{ da.pet }}."><br />
+        {% endfor %}
+      {% endif %}
+  </div> <!-- ENDS FORM CONTAINER -->
+
+  <div class="artist">
+      <p>Ormuco test was created by <a href="https://twitter.com/jairoserrano">Jairo Serrano</a>
+      <p>Original template created by <a href="http://joe-hirst.com">Joe Hirst</a> and inspired by <a href="https://twitter.com/treehouse">@treehouse</a></p>
+  </div>
+
+</body>
+</html>

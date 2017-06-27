@@ -1,0 +1,5 @@
+Flask==0.12
+Flask-DebugToolbar==0.10.1
+Flask-Migrate==2.0.4
+Flask-SQLAlchemy==2.2
+autoenv==1.0.0
