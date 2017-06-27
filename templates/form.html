@@ -3,40 +3,62 @@ Original template:
 https://codepen.io/josephhirst/pen/fljha?js-preprocessor=none
 -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
-	<link href='https://fonts.googleapis.com/css?family=Droid+Sans' rel='stylesheet' type='text/css'>
 	<title>Ormuco test</title>
 	<h1>Ormuco test</h1>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="{{ url_for('static', filename='jscolor.min.js') }}"></script>
 </head>
 <body>
-  <div id="form-container"><!-- BEGINS FORM CONTAINER -->
-	    <form action="/" method="post" autocomplete="on">
-	       	<input class="name-box" type="text" name="name" placeholder="Name"><br />
-	       	<input class="email-box" type="text" name="color" input="color" placeholder="Favorite Color"><br />
-          <input class="email-box" type="text" name="pet" input="pet" placeholder="Cats or Dogs"><br />
-	        <input class="animated bounceIn" type="submit" value="Save data">
-					{% with messages = get_flashed_messages() %}
-				  	{% if messages %}
-					    <ul class=flashes>
-					    {% for message in messages %}
-					      <li>{{ message }}</li>
-					    {% endfor %}
-					    </ul>
-				  	{% endif %}
-					{% endwith %}
-    	</form>
-      {% if data %}
-        {% for da in data %}
-        <input class="name-box" readonly type="text" placeholder="Saved {{ da.name }}, {{ da.color }}, {{ da.pet }}."><br />
-        {% endfor %}
-      {% endif %}
-  </div> <!-- ENDS FORM CONTAINER -->
+<div class="container">
+	<div class="row centered-form center-block">
+		<form action="/" method="post" autocomplete="on"  class="col-md-4 col-md-offset-4">
+		  <div class="form-group">
+		    <label for="name">Name:</label>
+		    <input type="text" class="form-control" name="name" id="name">
+		  </div>
+		  <div class="form-group">
+		    <label for="color">Choose color:</label>
+		    <input type="text" class="form-control jscolor" name="color" id="color">
+		  </div>
+		  <div class="form-group">
+				<label for="pet">Pet:</label>
+				<select class="form-control" name="pet" input="pet" placeholder="Cats or Dogs" >
+					<option value="cats">Cats</option>
+					<option value="dogs">Dogs</option>
+				</select>
+		  </div>
+		  <button type="submit" class="btn btn-default">Save data</button>
+		</form>
+			{% with messages = get_flashed_messages() %}
+				{% if messages %}
+				<div class="alert alert-warning">
+					<ul class=flashes>
+					{% for message in messages %}
+						<li>{{ message }}</li>
+					{% endfor %}
+					</ul>
+				</div>
+				{% endif %}
+			{% endwith %}
+		{% if data %}
+		<div class="alert alert-info">
+			{% for da in data %}
+			<input class="name-box" readonly type="text" placeholder="Saved {{ da.name }}, {{ da.color }}, {{ da.pet }}."><br />
+			{% endfor %}
+		</div>
+		{% endif %}
 
+	</div>
+	</div>
   <div class="artist">
       <p>Ormuco test was created by <a href="https://twitter.com/jairoserrano">Jairo Serrano</a>
-      <p>Original template created by <a href="http://joe-hirst.com">Joe Hirst</a> and inspired by <a href="https://twitter.com/treehouse">@treehouse</a></p>
+      <p>Original template created by <a href="http://joe-hirst.com">Joe Hirst</a> and inspired by <a href="https://twitter.com/treehouse">@treehouse</a>, <a href="http://jscolor.com/">jscolor</a> © 2017 East Desire - GPL3</p>
   </div>
 
 </body>

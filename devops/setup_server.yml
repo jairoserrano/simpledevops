@@ -79,7 +79,7 @@
       action: file dest={{ webapps_dir }}/{{ app_name }}/log state=directory
 
     - name: ensure database directory
-      action: file dest={{ webapps_dir }}/{{ app_name }}/db owner=www-data group=www-data mode=0644 state=directory
+      action: file dest={{ webapps_dir }}/{{ app_name }}/db owner=www-data group=www-data mode=0744 state=directory
 
     - name: deploy code from repository
       action: git repo={{ repo_url }} dest={{ webapps_dir }}/{{ app_name }}/src remote={{ repo_remote }} version={{ repo_version }}
