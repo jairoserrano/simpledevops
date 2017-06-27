@@ -35,26 +35,26 @@ https://codepen.io/josephhirst/pen/fljha?js-preprocessor=none
 		  </div>
 		  <button type="submit" class="btn btn-default">Save data</button>
 		</form>
-	</div>
-	</div>
-	{% with messages = get_flashed_messages() %}
-		{% if messages %}
-		<div class="alert alert-warning">
-			<ul class=flashes>
-			{% for message in messages %}
-				<li>{{ message }}</li>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+			<div class="alert alert-warning">
+				<ul class=flashes>
+				{% for message in messages %}
+					<li>{{ message }}</li>
+				{% endfor %}
+				</ul>
+			</div>
+			{% endif %}
+		{% endwith %}
+		{% if data %}
+		<div class="alert alert-info">
+			{% for da in data %}
+			<input class="name-box" readonly type="text" placeholder="Saved {{ da.name }}, {{ da.color }}, {{ da.pet }}."><br />
 			{% endfor %}
-			</ul>
 		</div>
 		{% endif %}
-	{% endwith %}
-	{% if data %}
-	<div class="alert alert-info">
-		{% for da in data %}
-		<input class="name-box" readonly type="text" placeholder="Saved {{ da.name }}, {{ da.color }}, {{ da.pet }}."><br />
-		{% endfor %}
 	</div>
-	{% endif %}
+</div>
   <div class="artist">
       <p>Ormuco test was created by <a href="https://twitter.com/jairoserrano">Jairo Serrano</a>
       <p>Bootstrap plus <a href="http://jscolor.com/">jscolor</a> © 2017 East Desire - GPL3</p>
