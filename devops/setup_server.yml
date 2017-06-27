@@ -45,6 +45,11 @@
       with_items:
         - virtualenv
         - uwsgi
+        - Flask
+        - Flask-Migrate
+        - Flask-Script
+        - Flask-SQLAlchemy
+        - Flask-DebugToolbar
 
     - name: remove default nginx site
       action: file path=/etc/nginx/sites-enabled/default state=absent
@@ -67,22 +72,25 @@
     - name: ensure log directory
       action: file dest={{ webapps_dir }}/{{ app_name }}/log state=directory
 
+    - name: ensure database directory
+      action: file dest={{ webapps_dir }}/{{ app_name }}/db state=directory
+
     - name: deploy code from repository
       action: git repo={{ repo_url }} dest={{ webapps_dir }}/{{ app_name }}/src remote={{ repo_remote }} version={{ repo_version }}
 
-    - name: install dependencies into virtualenv
-      action: pip requirements={{ webapps_dir }}/{{ app_name }}/src/requirements.txt virtualenv={{ webapps_dir }}/{{ app_name }}/venv state=present
-
     - name: create nginx site config
-      action: template src=templates/nginx_site.conf dest=/etc/nginx/sites-available/{{ app_name }}.conf
+      action: template src=templates/nginx_site.conf dest=/etc/nginx/sites-available/{{ app_name }}
       notify:
         - restart nginx
 
     - name: link nginx config
-      action: file src=/etc/nginx/sites-available/{{ app_name }}.conf dest=/etc/nginx/sites-enabled/{{ app_name }}.conf state=link
+      action: file src=/etc/nginx/sites-available/{{ app_name }} dest=/etc/nginx/sites-enabled/{{ app_name }} state=link
 
     - name: run flask migrate
       shell: cd {{ webapps_dir }}/{{ app_name }}/src; python manage.py db upgrade
+
+    - name: change permissions
+      shell: cd {{ webapps_dir }}/{{ app_name }}/db; chown www-data:www-data app.db
 
   handlers:
     - name: restart nginx

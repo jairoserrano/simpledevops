@@ -5,7 +5,7 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'OrmucoTestDev'
-    SQLALCHEMY_DATABASE_URI = "sqlite:///app.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///../db/app.db"
 
 class Prod(Config):
     DEBUG = False
