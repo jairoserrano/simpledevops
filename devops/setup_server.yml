@@ -1,0 +1,54 @@
+---
+
+- hosts: 192.34.79.129
+  user: ubuntu
+  sudo: yes
+
+  tasks:
+
+    - name: install packages
+      apt: name={{ item }} update_cache=yes state=latest
+      with_items:
+        - htop
+        - ufw
+
+    - name: add nginx
+      action: apt_repository repo=$item state=present
+      with_items:
+        - ppa:nginx/stable
+
+    - name: install main packages for python nginx
+      action: apt pkg=$item state=installed
+      with_items:
+        - python-setuptools
+        - python-imaging
+        - git
+        - nginx
+        - python-dev
+
+    - name: install pip
+      action: easy_install name=pip
+
+    - name: install various libraries with pip
+      action: pip name=$item state=present
+      with_items:
+        - virtualenv
+        - uwsgi
+
+    - name: remove default nginx site
+      action: file path=/etc/nginx/sites-enabled/default state=absent
+
+    - name: write nginx.conf
+      action: template src=templates/nginx.conf dest=/etc/nginx/nginx.conf
+
+    - name: create webapps directory
+      action: file dest=/srv/webapps state=directory
+
+    - name: Enable UFW
+      ufw: direction=incoming policy=deny state=enabled
+
+    - name: UFW limit SSH
+      ufw: rule=limit port=ssh
+
+    - name: UFW open HTTP
+      ufw: rule=allow port=http
