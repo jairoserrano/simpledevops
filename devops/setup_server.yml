@@ -1,8 +1,18 @@
 ---
 
 - hosts: 192.34.79.129
-  user: ubuntu
-  sudo: yes
+  remote_user: ubuntu
+  become: yes
+  become_method: sudo
+
+  vars:
+    app_name: ormuco
+    repo_url: https://github.com/jairoserrano/simpledevops.git
+    repo_remote: origin
+    repo_version: master
+    webapps_dir: /srv/webapps
+    wsgi_file: app.py
+    wsgi_callable: app
 
   tasks:
 
@@ -13,24 +23,25 @@
         - ufw
 
     - name: add nginx
-      action: apt_repository repo=$item state=present
+      action: apt_repository repo={{ item }} state=present
       with_items:
         - ppa:nginx/stable
 
-    - name: install main packages for python nginx
-      action: apt pkg=$item state=installed
+    - name: install main packages for python nginx build-essential
+      action: apt pkg={{ item }} state=installed
       with_items:
         - python-setuptools
         - python-imaging
         - git
         - nginx
         - python-dev
+        - build-essential
 
     - name: install pip
       action: easy_install name=pip
 
     - name: install various libraries with pip
-      action: pip name=$item state=present
+      action: pip name={{ item }} state=present
       with_items:
         - virtualenv
         - uwsgi
@@ -52,3 +63,27 @@
 
     - name: UFW open HTTP
       ufw: rule=allow port=http
+
+    - name: ensure log directory
+      action: file dest={{ webapps_dir }}/{{ app_name }}/log state=directory
+
+    - name: deploy code from repository
+      action: git repo={{ repo_url }} dest={{ webapps_dir }}/{{ app_name }}/src remote={{ repo_remote }} version={{ repo_version }}
+
+    - name: install dependencies into virtualenv
+      action: pip requirements={{ webapps_dir }}/{{ app_name }}/src/requirements.txt virtualenv={{ webapps_dir }}/{{ app_name }}/venv state=present
+
+    - name: create nginx site config
+      action: template src=templates/nginx_site.conf dest=/etc/nginx/sites-available/{{ app_name }}.conf
+      notify:
+        - restart nginx
+
+    - name: link nginx config
+      action: file src=/etc/nginx/sites-available/{{ app_name }}.conf dest=/etc/nginx/sites-enabled/{{ app_name }}.conf state=link
+
+    - name: run flask migrate
+      shell: cd {{ webapps_dir }}/{{ app_name }}/src; python manage.py db upgrade
+
+  handlers:
+    - name: restart nginx
+      action: service name=nginx state=restarted
