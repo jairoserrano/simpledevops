@@ -36,6 +36,9 @@
         - nginx
         - python-dev
         - build-essential
+        - uwsgi
+        - uwsgi-emperor
+        - uwsgi-plugin-python
 
     - name: install pip
       action: easy_install name=pip
@@ -57,6 +60,9 @@
     - name: write nginx.conf
       action: template src=templates/nginx.conf dest=/etc/nginx/nginx.conf
 
+    - name: write nginx.conf
+      action: template src=templates/ormuco.ini dest=/etc/uwsgi-emperor/vassals/ormuco.ini
+
     - name: create webapps directory
       action: file dest=/srv/webapps state=directory
 
@@ -73,7 +79,10 @@
       action: file dest={{ webapps_dir }}/{{ app_name }}/log state=directory
 
     - name: ensure database directory
-      action: file dest={{ webapps_dir }}/{{ app_name }}/db state=directory
+      action: file dest={{ webapps_dir }}/{{ app_name }}/var owner=www-data group=www-data mode=0644 state=directory
+
+    - name: ensure database directory
+      action: file dest={{ webapps_dir }}/{{ app_name }}/db owner=www-data group=www-data mode=0644 state=directory
 
     - name: deploy code from repository
       action: git repo={{ repo_url }} dest={{ webapps_dir }}/{{ app_name }}/src remote={{ repo_remote }} version={{ repo_version }}
@@ -89,9 +98,15 @@
     - name: run flask migrate
       shell: cd {{ webapps_dir }}/{{ app_name }}/src; python manage.py db upgrade
 
-    - name: change permissions
+    - name: change permissions database
       shell: cd {{ webapps_dir }}/{{ app_name }}/db; chown www-data:www-data app.db
+
+    - name: change permissions socket
+      shell: chmod 0755 {{ webapps_dir }}/{{ app_name }}/var
 
   handlers:
     - name: restart nginx
       action: service name=nginx state=restarted
+
+    - name: restart emperor.uwsgi
+      action: service name=emperor.uwsgi state=restarted
