@@ -16,37 +16,29 @@
 
   tasks:
 
-    - name: install packages
-      apt: name={{ item }} update_cache=yes state=latest
-      with_items:
-        - htop
-        - ufw
-
     - name: add nginx
       action: apt_repository repo={{ item }} state=present
       with_items:
         - ppa:nginx/stable
 
     - name: install main packages for python nginx build-essential
-      action: apt pkg={{ item }} state=installed
+      action: apt pkg={{ item }} state=installed update_cache=yes state=latest
       with_items:
         - python-setuptools
         - python-imaging
         - git
         - nginx
-        - python-dev
         - build-essential
+        - python-dev
         - uwsgi
         - uwsgi-emperor
         - uwsgi-plugin-python
-
-    - name: install pip
-      action: easy_install name=pip
+        - ufw
+        - python-pip
 
     - name: install various libraries with pip
       action: pip name={{ item }} state=present
       with_items:
-        - virtualenv
         - uwsgi
         - Flask
         - Flask-Migrate
@@ -60,7 +52,7 @@
     - name: write nginx.conf
       action: template src=templates/nginx.conf dest=/etc/nginx/nginx.conf
 
-    - name: write nginx.conf
+    - name: write uwsgi-emperor conf
       action: template src=templates/ormuco.ini dest=/etc/uwsgi-emperor/vassals/ormuco.ini
 
     - name: create webapps directory
