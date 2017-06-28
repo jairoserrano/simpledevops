@@ -1,4 +1,6 @@
 # simpledevops
-git clone https://github.com/jairoserrano/simpledevops.git
-cd simpledevops
-ansible-playbook devops/setup_server.yml -i devops/hosts
+  git clone https://github.com/jairoserrano/simpledevops.git
+
+  cd simpledevops
+
+  ansible-playbook devops/setup_server.yml -i devops/hosts
