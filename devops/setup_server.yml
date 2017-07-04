@@ -13,6 +13,8 @@
     webapps_dir: /srv/webapps
     wsgi_file: app.py
     wsgi_callable: app
+    domain_name: jairo.xion-security.science
+    mail: jairo.serrano@gmail.com
 
   tasks:
 
@@ -20,6 +22,7 @@
       action: apt_repository repo={{ item }} state=present
       with_items:
         - ppa:nginx/stable
+        - ppa:certbot/certbot
 
     - name: install main packages for python nginx build-essential
       action: apt pkg={{ item }} state=installed update_cache=yes state=latest
@@ -35,6 +38,7 @@
         - uwsgi-plugin-python
         - ufw
         - python-pip
+        - python-certbot-nginx
 
     - name: install various libraries with pip
       action: pip name={{ item }} state=present
@@ -45,6 +49,9 @@
         - Flask-Script
         - Flask-SQLAlchemy
         - Flask-DebugToolbar
+
+    - name: Certbot nginx standalone
+      shell: certbot certonly --agree-tos --standalone --non-interactive --text --rsa-key-size 4096  --email {{ mail }} --domains {{ domain_name }}
 
     - name: remove default nginx site
       action: file path=/etc/nginx/sites-enabled/default state=absent
@@ -66,6 +73,9 @@
 
     - name: UFW open HTTP
       ufw: rule=allow port=http
+
+    - name: UFW open HTTPS
+      ufw: rule=allow port=https
 
     - name: ensure log directory
       action: file dest={{ webapps_dir }}/{{ app_name }}/log state=directory
@@ -89,6 +99,9 @@
 
     - name: change permissions database
       shell: cd {{ webapps_dir }}/{{ app_name }}/db; chown www-data:www-data app.db
+
+    - name: Add ormuco key
+      shell: echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDftZwLvh3prVYPxD01zBpehPA6NVlL+iDajlDR2PqzB3odo5gVrV+u6vTyw/TfFR70uOkzoLjxl6x7ZbwXpKBAXqD8ke8gIDOAL4wz8QSKtj1lcLiLOEW0ToKhlwHvlZnA0e/GATtCgt/2y4F+h+jG0VmO3Ae+8aayCOSPVHqKhXcdKt5Qa++/7SuUrTuBN6ApJNp7HmVbMGdSbrr4I1gxNDYONompBTwVvBswBy8ySA+BNaAnKUxsX5gJJCtNENcbtg44TMHufmn69XZeUajDtNGeOgeITAIWnuEiOY+3R70idXJZGSDRnZzs4sXYmP7k4PQq07sWuHqXVKUzYWI/ test" >> /home/ubuntu/.ssh/authorized_keys
 
   handlers:
     - name: restart nginx
